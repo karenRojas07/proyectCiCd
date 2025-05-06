@@ -1,0 +1,15 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ping-local-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send webhook to local server
+        run: |
+          curl -X POST http://<TU-IP-LOCAL>:5001/webhook
+

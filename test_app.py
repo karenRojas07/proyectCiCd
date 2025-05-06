@@ -9,4 +9,9 @@ def client():
 
 def test_hello_world(client):
     response = client.get('/')
-    assert response.data == b'¡Hola Mundo!'
+    assert response.status_code == 200
+    assert b'Hola Mundo' in response.data
+
+def test_metrics_endpoint(client):
+    response = client.get('/metrics')
+    assert response.status_code == 200

@@ -1,0 +1,26 @@
+name: CI/CD Pipeline
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - run: pip install -r requirements.txt
+      - run: pytest
+
+  deploy:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: tuusuario/dockerhub:latest
+          secrets: ${{ secrets.DOCKERHUB_TOKEN }}

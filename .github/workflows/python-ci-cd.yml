@@ -1,0 +1,39 @@
+name: Python CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run tests
+      run: |
+        python -m pytest test_app.py -v
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Python and dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip python3-venv
+        python3 -m pip install --upgrade pip
+        pip3 install -r requirements.txt gunicorn
+    - name: Run application
+      run: |
+        nohup gunicorn -w 4 -b 0.0.0.0:5000 app:app > server.log 2>&1 &

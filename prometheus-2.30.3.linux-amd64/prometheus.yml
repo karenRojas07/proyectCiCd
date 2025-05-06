@@ -1,0 +1,52 @@
+name: Python CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run tests
+      run: pytest
+
+  deploy:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: your-dockerhub-username/python-cicd-app:latest
+        secrets: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    # Aquí agregarías pasos adicionales para despliegue en tu entorno productivo
+    # Ejemplo para servidor SSH:
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          docker pull your-dockerhub-username/python-cicd-app:latest
+          docker-compose down && docker-compose up -d
