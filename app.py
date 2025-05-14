@@ -10,7 +10,7 @@ REQUEST_COUNT = Counter('app_requests_total', 'Total web app requests')
 @app.route('/')
 def hello_world():
     REQUEST_COUNT.inc()
-    return '¡Hola Mundo con python realizando un despliegue continuo v10!'
+    return '¡Hola Mundo con python realizando un despliegue continuo v500!'
 
 # Añadir endpoint para métricas
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
